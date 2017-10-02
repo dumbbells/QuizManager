@@ -1,8 +1,5 @@
 <?php
 
-//del column
-//0 is not deleted. Inrement by 1 for each deletion. Largest del is most recent
-//put the undone deleted item back to front of list (highest pid in table)
 include "functions.php";
 define("SERVERNAME", "localhost");
 define("USERNAME", "root");
@@ -27,6 +24,30 @@ if (isset($_REQUEST["func"])) {
     }
 }
 
+function swap($data)
+{
+    $conn = new mysqli(SERVERNAME, USERNAME, PASSWORD, DBNAME);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    $pids = explode(" ", $data);
+    if ($pids[1] == "down") {
+        
+    }
+    else if ($pids[1] == "up") {
+        $sql = "SELECT * FROM problem WHERE pid = 98 OR pid = (select min(pid) FROM problem WHERE pid > 98 AND del < 1)";
+        $results = $conn->query($sql);
+        
+    }
+    else {
+        //$sql = "SELECT content FROM problem WHERE pid=$pids[0] OR pid=$pids[1]";
+        //$results = $conn->query($sql);
+        //$sql = "UPDATE problem "
+        
+    }
+    $conn->close();
+}
+
 function edit($data)
 {
     $conn = new mysqli(SERVERNAME, USERNAME, PASSWORD, DBNAME);
@@ -36,7 +57,7 @@ function edit($data)
     }
     $sql = "UPDATE problem SET content = '" . $data['data'] . "' WHERE pid = " . $data['id'];
     $conn->query($sql);
-    
+
     echo $data['data'];
     $conn->close();
 }
@@ -50,11 +71,7 @@ function insertNewQuestion($content)
     }
     $sql = "INSERT INTO mathprobdb.problem (content) VALUES ('$content')";
     $conn->query($sql);
-}
-
-function swap($data)
-{
-    $pids = explode(" ", $data);
+    $conn->close();
 }
 
 function undoDeletion()
