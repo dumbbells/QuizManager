@@ -10,19 +10,35 @@ include 'dataAccess.php';
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+            tex2jax: {
+            inlineMath: [["$","$"],["\\(","\\)"]]
+            }
+            });
+        </script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         <script src="scripts.js"></script>
     </head>
     <body>
+<!--        <script>(function () {
+    var QUEUE = MathJax.Hub.queue;
+    QUEUE.Push(function () {
+        math = MathJax.Hub.getAllJax("MathOutput")[0];
+    });
+    window.UpdateMath = function () {
+        QUEUE.Push(["Text", math]);
+    }
+})();</script>-->
         <div class="container">
             <div class='jumbotron' style="background-color:#5bc0de">
                 <h1>Math Quiz Manager</h1>
             </div>
             <?php
-
             ?>
             <div class="row">
                 <div class="col-sm-10">
+                    <!-- add validation for new question -->
                     <form method="POST" action="dataAccess.php" id="newQuestion" style="display:none">
                         <textarea rows="5" style="min-width: 100%" name="content"></textarea><br />
                         <input type="hidden" name="newQuestionAdded" value="true"> 
@@ -39,6 +55,6 @@ include 'dataAccess.php';
                 </div>
             </div>
         </div>
-<?php loadProblems(); ?>
+        <?php loadProblems(); ?>
     </body>
 </html>

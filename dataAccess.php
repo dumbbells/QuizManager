@@ -30,22 +30,33 @@ function swap($data)
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
+    $print = false;
     $pids = explode(" ", $data);
     if ($pids[1] == "down") {
-        
+        $print = true;
+        $sql = "SELECT MAX(pid) as 'pid' FROM problem WHERE pid < $pids[0] AND del < 1";
+        $pids[1] = $conn->query($sql)->fetch_object()->pid;
     }
     else if ($pids[1] == "up") {
-        $sql = "SELECT * FROM problem WHERE pid = 98 OR pid = (select min(pid) FROM problem WHERE pid > 98 AND del < 1)";
-        $results = $conn->query($sql);
-        
+        $print = true;
+        $sql = "SELECT MIN(pid) as 'pid' FROM problem WHERE pid > $pids[0] AND del < 1";
+        $pids[1] = $conn->query($sql)->fetch_object()->pid;
+    }
+    $sql = "UPDATE
+    problem AS problem1
+    JOIN problem AS problem2 ON
+           ( problem1.pid = $pids[0] AND problem2.pid = $pids[1])
+        OR ( problem1.pid = $pids[1] AND problem2.pid = $pids[0])    
+    SET
+	problem1.content = problem2.content,
+        problem2.content = problem1.content;";
+    $conn->query($sql);
+    if ($print) {
+        loadProblems($conn);
     }
     else {
-        //$sql = "SELECT content FROM problem WHERE pid=$pids[0] OR pid=$pids[1]";
-        //$results = $conn->query($sql);
-        //$sql = "UPDATE problem "
-        
+        $conn->close();
     }
-    $conn->close();
 }
 
 function edit($data)

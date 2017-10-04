@@ -1,9 +1,19 @@
+(function () {
+    var QUEUE = MathJax.Hub.queue;
+    QUEUE.Push(function () {
+        math = MathJax.Hub.getAllJax("MathOutput")[0];
+    });
+    window.UpdateMath = function () {
+        QUEUE.Push(["Text", math]);
+    };
+})();
 function undoDeletion() {
     if (confirm("Undo most recent deletion?")) {
         $("#problems").load("dataAccess.php",
                 {
                     func: "undoDeletion"
-                }
+                },
+                UpdateMath()
         );
     }
 }
@@ -48,14 +58,19 @@ function MoveUp(element) {
     var controller = $(element).parents("div.controller");
     var pid1 = controller.find("div.content").attr("id");
     if (controller.prev('.controller')[0]) {
-        var pid2 = controller.next().find("div.content").attr("id");
+        var pid2 = controller.prev().find("div.content").attr("id");
         var current = controller.find("div.content").html();
         controller.find("div.content").html(controller.prev().find("div.content").html());
         controller.prev().find("div.content").html(current);
-
-        //post goes here
+        $.post("dataAccess.php", {
+            data: pid1 + " " + pid2,
+            func: "swap"
+        });
     } else {
-        console.log("not on screen");
+        $("#problems").load("dataAccess.php", {
+            data: pid1 + " up",
+            func: "swap"
+        });
     }
 }
 
@@ -66,7 +81,7 @@ function Edit(element) {
             "data": content.find("textArea").val()
         },
         func: "edit"
-    }, function(){
+    }, function () {
         content.find("textArea").html(content.find("p").html());
         content.find("form").toggle();
     });
