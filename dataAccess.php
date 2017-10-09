@@ -129,6 +129,10 @@ function loadProblems($conn = null)
     }
 
     $firstOnPage = isset($_GET['page']) ? 20 * ($_GET['page'] - 1) : 0;
+    if ($firstOnPage == 0 && isset($_REQUEST['page']))
+    {
+        $firstOnPage = ($_REQUEST['page'] - 1) * 20;
+    }
     $sql = "SELECT * FROM problem  WHERE del = 0 ORDER BY pid DESC LIMIT " . $firstOnPage . ", 20";
     $result = $conn->query($sql);
     $sql = "SELECT COUNT(*) as 'count' FROM problem";
