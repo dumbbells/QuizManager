@@ -1,6 +1,5 @@
 <?php
 
-include "functions.php";
 define("SERVERNAME", "localhost");
 define("USERNAME", "root");
 define("PASSWORD", "");
@@ -22,6 +21,23 @@ if (isset($_REQUEST["func"])) {
     else {
         $function();
     }
+}
+
+function loadTags($idList) {
+    if ($idList == null){
+        return;
+    }
+    $conn = new mysqli(SERVERNAME, USERNAME, PASSWORD, DBNAME);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    $sql = "SELECT * FROM tags WHERE tags.id IN (" . $idList . ");";   
+    $result = $conn->query($sql);
+    while ($row = $result->fetch_assoc()){
+        $tag = new Tag($row['keyword'], $row['count']);
+        $tag->printTag();
+    }
+    $conn->close();
 }
 
 function swap($data)
@@ -135,7 +151,7 @@ function loadProblems($conn = null)
     }
     $sql = "SELECT * FROM problem  WHERE del = 0 ORDER BY pid DESC LIMIT " . $firstOnPage . ", 20";
     $result = $conn->query($sql);
-    $sql = "SELECT COUNT(*) as 'count' FROM problem";
+    $sql = "SELECT COUNT(*) as 'count' FROM problem WHERE del = 0";
     $countResult = $conn->query($sql)->fetch_object();
     $count = $countResult->count;
     $conn->close();

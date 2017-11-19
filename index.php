@@ -1,5 +1,7 @@
 <?php
 include 'dataAccess.php';
+include 'functions.php';
+include 'Tag.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,23 +23,12 @@ include 'dataAccess.php';
         <script src="scripts.js"></script>
     </head>
     <body>
-<!--        <script>(function () {
-    var QUEUE = MathJax.Hub.queue;
-    QUEUE.Push(function () {
-        math = MathJax.Hub.getAllJax("MathOutput")[0];
-    });
-    window.UpdateMath = function () {
-        QUEUE.Push(["Text", math]);
-    }
-})();</script>-->
         <div class="container">
             <div class='jumbotron' style="background-color:#5bc0de">
                 <h1>Math Quiz Manager</h1>
             </div>
-            <?php
-            ?>
             <div class="row">
-                <div class="col-sm-10">
+                <div class="col-sm-5">
                     <!-- add validation for new question -->
                     <form method="POST" action="dataAccess.php" id="newQuestion" style="display:none">
                         <textarea rows="5" style="min-width: 100%" name="content"></textarea><br />
@@ -45,8 +36,10 @@ include 'dataAccess.php';
                         <input class="btn btn-info pull-right" type="submit" value="Save">
                     </form>
                 </div>
-                <div class="col-sm-2">
-                    <div class="btn-group pull-right">
+                <div class="col-sm-7">
+                    <div class="input-group pull-right">
+		                <input type="search" placeholder="keywords">
+                        <button class="btn btn-info"><span class="glyphicon glyphicon-search"></span></button>    
                         <button class="btn btn-info" data-toggle="tooltip" title="Undo previous deletion" onclick="undoDeletion();">
                             <span class="glyphicon glyphicon-chevron-left"></span></button>
                         <button class="btn btn-info" data-toggle="tooltip" title="Add new question" onclick="$(newQuestion).toggle();">
@@ -54,6 +47,13 @@ include 'dataAccess.php';
                     </div>
                 </div>
             </div>
+                <div class="row" style="padding: 5px;">
+                    <div class="col-sm-12 pull-right">
+                        <div class="pull-right">
+                            <p>Placeholder for search tags</p>
+                        </div>
+                    </div>
+                </div>
         </div>
         <?php loadProblems(); ?>
     </body>

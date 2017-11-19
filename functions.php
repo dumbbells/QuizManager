@@ -23,9 +23,6 @@ function pagination($pages, $currentPage)
     }
     echo "</ul></div>";
 }
-?>
-
-<?php
 
 function renderProblems($pages, $firstOnPage, $result)
 {
@@ -40,27 +37,38 @@ function renderProblems($pages, $firstOnPage, $result)
             <div class='row controller' style="border-bottom: 1px solid #ccc; min-height: 100px;">
                 <div class="col-sm-1"><h4><?php echo $x; ?></h4></div>
                 <div class="content" id="<?php echo $row["pid"]; ?>">
-                    <div class='col-sm-8'>
+                    <div class='col-sm-7'>
                         <p><?php echo $row["content"]; ?></p>
                         <form style="display:none" onsubmit="return Edit(this);">
                             <textarea name="Text1" rows="5" style="min-width: 100%"><?php echo $row["content"]; ?></textarea>
                             <br />
                             <input class="btn btn-info pull-right" type="submit" value="Save changes">
                         </form>
+                        <?php loadTags($row["keywords"]); ?>
                     </div>
-                    <div class='col-sm-3 btn-group'>
-                        <button class='btn btn-info' onclick="$(this).parentsUntil('div.controller').find('form').toggle();">
-                            <span class="glyphicon glyphicon-font"></span>
-                        </button>
-                        <button class="btn btn-info" onclick="Delete(this);">
-                            <span class="glyphicon glyphicon-minus"></span>
-                        </button>
-                        <button class="btn btn-info" onclick="MoveUp(this);">
-                            <span class="glyphicon glyphicon-chevron-up"></span>
-                        </button>
-                        <button class="btn btn-info" onclick="MoveDown(this);">
-                            <span class="glyphicon glyphicon-chevron-down"></span>
-                        </button>
+                    <div class='col-sm-4'>
+                        <div class='btn-group pull-right'>
+                            <button class='btn btn-info' onclick="$(this).parentsUntil('div.controller').find('form').toggle();">
+                                <span class="glyphicon glyphicon-font"></span>
+                            </button>
+                            <button class="btn btn-info" onclick="Delete(this);">
+                                <span class="glyphicon glyphicon-minus"></span>
+                            </button>
+                            <button class="btn btn-info" onclick="MoveUp(this);">
+                                <span class="glyphicon glyphicon-chevron-up"></span>
+                            </button>
+                            <button class="btn btn-info" onclick="MoveDown(this);">
+                                <span class="glyphicon glyphicon-chevron-down"></span>
+                            </button>
+                            <button class="btn btn-info" onclick="ToggleTagEntry(this);">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </button>
+                        </div>
+                        <div class="pull-right tagEntry" style="display:none;">
+                            <span><input type="text" style="width:176px;"> 
+                                <span class="glyphicon glyphicon-check" onclick="alert('tag added');"></span>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div><?php } ?>

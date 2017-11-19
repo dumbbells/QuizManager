@@ -1,6 +1,12 @@
 var temp = window.location.search.substring(1);
 var page = temp.split("=");
 
+function ToggleTagEntry(element) {
+    var tagEntry = $(element).closest("div.col-sm-4").find("div.tagEntry");
+    tagEntry.toggle();
+    $(tagEntry).find("input").focus();
+}
+
 function reload() {
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, "problems"]);
 }
