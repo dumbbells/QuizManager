@@ -1,5 +1,6 @@
 <?php
 
+include_once "Tag.php";
 define("SERVERNAME", "localhost");
 define("USERNAME", "root");
 define("PASSWORD", "");
@@ -23,6 +24,86 @@ if (isset($_REQUEST["func"])) {
     }
 }
 
+function removeTag($data) {
+    $conn = new mysqli(SERVERNAME, USERNAME, PASSWORD, DBNAME);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    $sql = "SELECT * FROM problem WHERE pid = ".$data['problem'].";";
+    $result = $conn->query($sql);
+    $problem = $result->fetch_object();
+    $keywords = $problem->keywords;
+    if (strpos($data['tagId'].", ") !== false) {
+        $keywords = str_replace($keywords, $data['tagId'].", ", "");
+    }
+    elseif (strpos(' ,'.$data['tagId']) !== false) {
+        $keywords = str_replace($keywords, ", ".$data['tagId'], "");
+    }
+    else {
+        $keywords = "";
+    }
+    $conn->query("UPDATE problem SET keywords = '".$keywords."' WHERE pid = ".$data['problem'].";");
+    
+    $conn->close();
+    echo "success";
+}
+
+function AddNewTag($data) {
+    $conn = new mysqli(SERVERNAME, USERNAME, PASSWORD, DBNAME);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    $sql = "SELECT id FROM keywords WHERE keyword = '" . $data["newTag"] . "';";
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        $id = $result->fetch_object()->id;
+        $sql = "SELECT * FROM problem WHERE pid = '" . $data["problem"] . "' AND find_in_set(" . $id . ", cast(keywords as char)) > 0;";
+        if ($conn->query($sql)->num_rows > 0){ 
+            $conn->close();
+            echo "-1";
+            return;
+        }
+        $sql = "UPDATE keywords SET count = count + 1 WHERE id = " . $id . " ;";
+        $conn->query($sql);
+        
+        $sql = "SELECT * FROM problem WHERE pid = " . $data["problem"] . ";";
+        $result = $conn->query($sql);
+        $keywords = $result->fetch_object()->keywords;
+        if ($keywords == null ) {
+            $sql = "UPDATE problem SET keywords ='" . $id . "' WHERE pid = '" . $data["problem"] . "';";
+            $conn->query($sql);
+        }
+        else {
+            $sql = "UPDATE problem SET keywords ='".$keywords.",".$id."' WHERE pid = '".$data['problem']."';";
+            $conn->query($sql);
+        }
+        
+        $conn->close();
+        loadTags($id);
+    }
+    else {
+        $sql = "INSERT INTO keywords (keyword) VALUES ('" . $data["newTag"] . "');";
+        $conn->query($sql);
+        $sql = "SELECT keywords FROM problem WHERE pid = '" . $data["problem"] . "';";
+        $result = $conn->query($sql);
+        if ($result->num_rows == 0) {
+            $sql = "INSERT INTO problem (keywords) VALUES ('" . $data['newTag'] . "') WHERE pid = '" . $data["problem"] . "';";
+            $conn->query($sql);
+        }
+        else {
+            $keywords = $result->keywords;
+            $sql = "UPDATE problem SET keywords ='".$keywords.",".$id."' WHERE pid = '".$data['problem']."';";
+            $conn->query($sql);
+        }
+        $sql = "SELECT id FROM keywords WHERE keyword = '" . $data["newTag"] . "';";
+        $result = $conn->query($sql);
+
+        $conn->close();
+        loadTags($result->fetch_object()->id);
+    }
+
+}
+
 function loadTags($idList) {
     if ($idList == null){
         return;
@@ -31,11 +112,13 @@ function loadTags($idList) {
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
-    $sql = "SELECT * FROM tags WHERE tags.id IN (" . $idList . ");";   
+    $sql = "SELECT * FROM keywords WHERE keywords.id IN (" . $idList . ");";   
     $result = $conn->query($sql);
-    while ($row = $result->fetch_assoc()){
-        $tag = new Tag($row['keyword'], $row['count']);
-        $tag->printTag();
+    if ($result){
+        while ($row = $result->fetch_assoc()){
+            $tag = new Tag($row['keyword'], $row['count'], $row['id']);
+            $tag->printTag();
+        }
     }
     $conn->close();
 }
@@ -68,7 +151,8 @@ function swap($data)
         problem2.content = problem1.content;";
     $conn->query($sql);
     if ($print) {
-        loadProblems($conn);
+        $conn->close();
+        loadProblems();
     }
     else {
         $conn->close();
@@ -118,7 +202,8 @@ function undoDeletion()
     else {
         echo "<script> alert('No problems to undelete');</script>";
     }
-    loadProblems($conn);
+    loadProblems();
+    $conn->close();
 }
 
 function deleteProblem($id)
@@ -135,21 +220,25 @@ function deleteProblem($id)
     $sql = "UPDATE mathprobdb.problem SET del = $delIndex WHERE pid = $id";
     $conn->query($sql);
 
-    loadProblems($conn);
+    loadProblems();
+    $conn->close();
 }
 
-function loadProblems($conn = null)
+function loadProblems($data = null)
 {
-    if ($conn === null) {
-        $conn = new mysqli(SERVERNAME, USERNAME, PASSWORD, DBNAME);
-    }
+    $conn = new mysqli(SERVERNAME, USERNAME, PASSWORD, DBNAME);
 
     $firstOnPage = isset($_GET['page']) ? 20 * ($_GET['page'] - 1) : 0;
     if ($firstOnPage == 0 && isset($_REQUEST['page']))
     {
         $firstOnPage = ($_REQUEST['page'] - 1) * 20;
     }
-    $sql = "SELECT * FROM problem  WHERE del = 0 ORDER BY pid DESC LIMIT " . $firstOnPage . ", 20";
+    if ($data == null) {
+        $sql = "SELECT * FROM problem  WHERE del = 0 ORDER BY pid DESC LIMIT " . $firstOnPage . ", 20";
+    }
+    else {
+        
+    }
     $result = $conn->query($sql);
     $sql = "SELECT COUNT(*) as 'count' FROM problem WHERE del = 0";
     $countResult = $conn->query($sql)->fetch_object();

@@ -66,7 +66,7 @@ function renderProblems($pages, $firstOnPage, $result)
                         </div>
                         <div class="pull-right tagEntry" style="display:none;">
                             <span><input type="text" style="width:176px;"> 
-                                <span class="glyphicon glyphicon-check" onclick="alert('tag added');"></span>
+                                <span class="glyphicon glyphicon-check" onclick="AddNewTag(this);"></span>
                             </span>
                         </div>
                     </div>

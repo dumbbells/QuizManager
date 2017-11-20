@@ -1,7 +1,7 @@
 <?php
 include 'dataAccess.php';
 include 'functions.php';
-include 'Tag.php';
+include_once 'Tag.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,7 +29,6 @@ include 'Tag.php';
             </div>
             <div class="row">
                 <div class="col-sm-5">
-                    <!-- add validation for new question -->
                     <form method="POST" action="dataAccess.php" id="newQuestion" style="display:none">
                         <textarea rows="5" style="min-width: 100%" name="content"></textarea><br />
                         <input type="hidden" name="newQuestionAdded" value="true"> 
@@ -38,8 +37,8 @@ include 'Tag.php';
                 </div>
                 <div class="col-sm-7">
                     <div class="input-group pull-right">
-		                <input type="search" placeholder="keywords">
-                        <button class="btn btn-info"><span class="glyphicon glyphicon-search"></span></button>    
+		        <input type="search" id="searchBar" placeholder="keywords">
+                        <button class="btn btn-info" onclick="Search();"><span class="glyphicon glyphicon-search"></span></button>    
                         <button class="btn btn-info" data-toggle="tooltip" title="Undo previous deletion" onclick="undoDeletion();">
                             <span class="glyphicon glyphicon-chevron-left"></span></button>
                         <button class="btn btn-info" data-toggle="tooltip" title="Add new question" onclick="$(newQuestion).toggle();">

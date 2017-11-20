@@ -1,6 +1,55 @@
 var temp = window.location.search.substring(1);
 var page = temp.split("=");
 
+function Search() {
+    $("#problems").load("dataAccess.php",
+            {
+                func: "loadProblems",
+                page: page[1],
+                data: $("#searchBar").val()
+                
+            });
+}
+
+function RemoveTag(element) {
+    $.ajax({
+       url: "dataAccess.php",
+       type: "get",
+       data: {
+           func: "removeTag",
+           data: {"tagId": $(element).attr("id"), "problem": $(element).closest("div.content").attr("id") }
+       },
+       success: function (response) {
+           $(element).parent("span").remove();
+       },
+       error: function(xhr) {
+           alert("Something went wrong.");
+       }
+    });
+}
+
+function AddNewTag(element) {
+    var newTag = $(element).prev("input").val();
+    $.ajax({
+        url: "dataAccess.php",
+        type: "get",
+        data: {
+            func: "AddNewTag",
+            data: {"newTag":newTag, "problem": $(element).closest("div.content").attr("id") }
+        },
+        success: function (response) {
+            if(response == -1) {
+                alert("Can not repeat tags");
+                return;
+            }
+            $(element).closest("div.col-sm-4").prev("div").append(response);
+        },
+        error: function (xhr) {
+            alert("it didn't work :(");
+        }
+    });
+}
+
 function ToggleTagEntry(element) {
     var tagEntry = $(element).closest("div.col-sm-4").find("div.tagEntry");
     tagEntry.toggle();
