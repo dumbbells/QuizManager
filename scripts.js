@@ -7,24 +7,24 @@ function Search() {
                 func: "loadProblems",
                 page: page[1],
                 data: $("#searchBar").val()
-                
+
             });
 }
 
 function RemoveTag(element) {
     $.ajax({
-       url: "dataAccess.php",
-       type: "get",
-       data: {
-           func: "removeTag",
-           data: {"tagId": $(element).attr("id"), "problem": $(element).closest("div.content").attr("id") }
-       },
-       success: function (response) {
-           $(element).parent("span").remove();
-       },
-       error: function(xhr) {
-           alert("Something went wrong.");
-       }
+        url: "dataAccess.php",
+        type: "get",
+        data: {
+            func: "removeTag",
+            data: {"tagId": $(element).attr("id"), "problem": $(element).closest("div.content").attr("id")}
+        },
+        success: function (response) {
+            $(element).parent("span").remove();
+        },
+        error: function (xhr) {
+            alert("Something went wrong.");
+        }
     });
 }
 
@@ -35,10 +35,10 @@ function AddNewTag(element) {
         type: "get",
         data: {
             func: "AddNewTag",
-            data: {"newTag":newTag, "problem": $(element).closest("div.content").attr("id") }
+            data: {"newTag": newTag, "problem": $(element).closest("div.content").attr("id")}
         },
         success: function (response) {
-            if(response == -1) {
+            if (response == -1) {
                 alert("Can not repeat tags");
                 return;
             }

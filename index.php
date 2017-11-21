@@ -1,7 +1,11 @@
 <?php
 include 'dataAccess.php';
-include 'functions.php';
+include_once 'functions.php';
 include_once 'Tag.php';
+$search = null;
+if (isset($_REQUEST["search"])) {
+    $search = $_REQUEST["search"];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -46,14 +50,7 @@ include_once 'Tag.php';
                     </div>
                 </div>
             </div>
-                <div class="row" style="padding: 5px;">
-                    <div class="col-sm-12 pull-right">
-                        <div class="pull-right">
-                            <p>Placeholder for search tags</p>
-                        </div>
-                    </div>
-                </div>
         </div>
-        <?php loadProblems(); ?>
+        <?php loadProblems($search); ?>
     </body>
 </html>

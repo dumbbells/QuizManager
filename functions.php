@@ -1,10 +1,19 @@
 <?php
+
 function pagination($pages, $currentPage)
 {
+    if (isset($_REQUEST['search'])) {
+        $search = "search=" . $_REQUEST['search'];
+    }
+    else
+    {
+        $search = false;
+    }
+
     echo "<div class='text-center'><ul class='pagination'>";
     if ($currentPage > 1) {
         echo "<li><a href='http://localhost/Project1/index.php?page="
-        . ($currentPage - 1)
+        . ($currentPage - 1) . ($search ? "&$search" : "")
         . "'><span class='glyphicon glyphicon-menu-left'></span></a></li>";
     }
     for ($x = 1; $x <= $pages; $x++) {
@@ -12,13 +21,13 @@ function pagination($pages, $currentPage)
             echo "<li class='disabled'><a href='' style='pointer-events: none;'>";
         }
         else {
-            echo "<li><a href='http://localhost/Project1/index.php?page=$x'>";
+            echo "<li><a href='http://localhost/Project1/index.php?page=$x" . ($search ? "&$search" : "") . "'>";
         }
         echo "$x</a></li>";
     }
     if ($currentPage < $pages) {
         echo "<li><a href='http://localhost/Project1/index.php?page="
-        . ($currentPage + 1)
+        . ($currentPage + 1) . ($search ? "&$search" : "")
         . "'><span class='glyphicon glyphicon-menu-right'></span></a></li>";
     }
     echo "</ul></div>";

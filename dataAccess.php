@@ -1,6 +1,8 @@
 <?php
 
 include_once "Tag.php";
+include_once "functions.php";
+
 define("SERVERNAME", "localhost");
 define("USERNAME", "root");
 define("PASSWORD", "");
@@ -233,15 +235,46 @@ function loadProblems($data = null)
     {
         $firstOnPage = ($_REQUEST['page'] - 1) * 20;
     }
+        $id = [];
     if ($data == null) {
         $sql = "SELECT * FROM problem  WHERE del = 0 ORDER BY pid DESC LIMIT " . $firstOnPage . ", 20";
     }
     else {
+        $keywords = explode(",", $data);
+        foreach ($keywords as $keyword) {   
+            $keyword = trim($keyword);
+            $sql = "SELECT id FROM keywords WHERE keyword = '$keyword'";
+            $id[] = $conn->query($sql)->fetch_object()->id;
+        }
+        $sql = "SELECT * FROM problem WHERE del = 0 AND (";
+        $count = 0;
+        foreach ($id as $single) {
+            $sql .= ($count > 0 ? "OR " : "") . "keywords LIKE '%$single%' ";
+            $count++;
+        }
         
+        $sql .= ") ORDER BY (";
+        $count = 0;
+        foreach ($id as $single) {
+            $sql .= ($count > 0 ? " + ": "") . "(keywords LIKE '%$single%')";
+            $count++;
+        }   
+        $sql .= ") DESC LIMIT " . $firstOnPage . ", 20;";
     }
     $result = $conn->query($sql);
-    $sql = "SELECT COUNT(*) as 'count' FROM problem WHERE del = 0";
-    $countResult = $conn->query($sql)->fetch_object();
+    if ($data == null) {
+        $sql1 = "SELECT COUNT(*) as 'count' FROM problem WHERE del = 0";
+    }
+    else {
+        $sql1 = "SELECT COUNT(*) as 'count' FROM problem WHERE del = 0 AND (";
+                $count = 0;
+        foreach ($id as $single) {
+            $sql1 .= ($count > 0 ? "OR " : "") . "keywords LIKE '%$single%' ";
+            $count++;
+        }
+        $sql1 .= ")";
+    }
+    $countResult = $conn->query($sql1)->fetch_object();
     $count = $countResult->count;
     $conn->close();
 
