@@ -2,6 +2,10 @@ var temp = window.location.search.substring(1);
 var page = temp.split("=");
 
 function Search() {
+    if ($("#searchBar").val() === ""){
+        alert("You must enter something!");
+        return;
+    }
     $("#problems").load("dataAccess.php",
             {
                 func: "loadProblems",
